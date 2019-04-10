@@ -24,7 +24,7 @@ from sklearn.random_projection import sparse_random_matrix
 # Here is our preprocessing class
 class Preprocessing(BaseEstimator):
     def __init__(self):
-        self.transformer = TruncatedSVD(n_components=5, n_iter=7, random_state=42)
+        self.transformer = TruncatedSVD(n_components=20)
 
     def fit(self, X, y=None):
         return self.transformer.fit(X, y)
@@ -38,15 +38,15 @@ class Preprocessing(BaseEstimator):
     
 # Here is our classifier model (multiclass perceptron)
 class model ():
-    def __init__(self,EPOCH,ETA):
+    def __init__(self):
         '''
         This constructor initialize data members. 
         '''
-        self.NBEPOCH = EPOCH # number of iterations (it seems to us the be the best value)
+        self.NBEPOCH = 2000 # number of iterations (it seems to us the be the best value)
         self.NBCLASSES = 10 # number of classes
         self.is_trained = False # Used to know if the perceptron is trained or not
         self.w = np.array([]) # array of weights
-        self.ETA = ETA # value of train rate : We used the main class the find the best value
+        self.ETA = 0.5 # value of train rate : We used the main class the find the best value
         
     def fit(self,X,y) :
         '''
@@ -54,6 +54,9 @@ class model ():
         X: Training data matrix of dim num_train_samples * num_feat.
         y: Training label matrix of dim num_train_samples * num_labels.
         '''
+        prepro = Preprocessing()
+        X = prepro.fit_transform(X,y)
+        
         self.w = np.zeros((self.NBCLASSES,X.shape[1])) # initialization of weights
         arg_max, predicted_class = 0, 0 # initialization of argmax and predictions
         nberreur = 0
@@ -81,6 +84,10 @@ class model ():
         '''
         This function should provide predictions of labels on (test) data.
         '''
+        
+        prepro = Preprocessing()
+        X = X = prepro.fit_transform(X)
+        
         y = np.zeros(X.shape[0])
         # For each data we predict the class and we put it in a array (with arg_max)
         for j in range(X.shape[0]) :
@@ -106,7 +113,8 @@ class model ():
 
 
 ## Here, we used a main function in order to determine the best value for ETA
-## and best the number of iterations.
+## and best the number of iterations. We also test results with and without preprocessing
+'''
 from libscores import get_metric
 metric_name, scoring_function = get_metric()
 def main(D):
@@ -116,12 +124,12 @@ def main(D):
     data_name = 'hadaca'
     trained_model_name = model_dir + data_name
     # Détermination du learning-rate
-    for p in np.arange(1000,1500,100) :
-        for e in np.arange(0.05,1,0.05) :
+    for p in np.arange(1000,2000,100) :
+        for e in np.arange(0.2,0.5,0.05) :
             M1 = model(p,e)
             
             ## Without preprocessing
-            '''
+            
             X_train = D.data['X_train']
             Y_train = D.data['Y_train'].ravel()
 
@@ -130,7 +138,7 @@ def main(D):
 
             X_test = D.data['X_test']
             Y_test = D.data['Y_test'].ravel()
-            '''
+               
             ## With preprocessing
             
             prepro = Preprocessing()
@@ -143,7 +151,7 @@ def main(D):
 
             X_test = prepro.transform(D.data['X_test'])
             Y_test = D.data['Y_test'].ravel()
-            
+             
             # We train the model only if he is not trained yet
             if not(M1.is_trained) or True:
                 M1.fit(X_train, Y_train)
@@ -154,4 +162,4 @@ def main(D):
             Y_hat_test_facto = M1.predict(X_test)
 
             # Print of the score for each set of parameters
-            print("EPOCH = ",p,"ETA = ",e, 'Score (train set) =', scoring_function(Y_train, Y_hat_train_facto))
+            print("EPOCH = ",p,"ETA = ",e, 'Score (train set) =', scoring_function(Y_train, Y_hat_train_facto))'''
