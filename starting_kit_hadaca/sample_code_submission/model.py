@@ -52,8 +52,8 @@ class model ():
         X: Training data matrix of dim num_train_samples * num_feat.
         y: Training label matrix of dim num_train_samples * num_labels.
         '''
-        #prepro = Preprocessing()
-        #X = prepro.fit_transform(X,y)
+        prepro = Preprocessing()
+        X = prepro.fit_transform(X,y)
         
         self.w = np.zeros((self.NBCLASSES,X.shape[1])) # initialization of weights
         arg_max, predicted_class = 0, 0 # initialization of argmax and predictions
@@ -83,8 +83,8 @@ class model ():
         This function should provide predictions of labels on (test) data.
         '''
         
-        #prepro = Preprocessing()
-        #X = prepro.fit_transform(X)
+        prepro = Preprocessing()
+        X = prepro.fit_transform(X)
         
         y = np.zeros(X.shape[0])
         # For each data we predict the class and we put it in a array (with arg_max)
@@ -125,13 +125,12 @@ def main(D):
     X_train = D.data['X_train']
     Y_train = D.data['Y_train'].ravel()
     
-    #X_valid = D.data['X_valid']
-    #Y_valid = D.data['Y_valid'].ravel()
+    X_valid = D.data['X_valid']
+    Y_valid = D.data['Y_valid'].ravel()
 
-    #X_test = D.data['X_test']
-    #Y_test = D.data['Y_test'].ravel()
-            
-            
+    X_test = D.data['X_test']
+    Y_test = D.data['Y_test'].ravel()
+       
     # Détermination du learning-rate
     maxS = 0
     for p in np.arange(250,350,100) :
@@ -144,8 +143,8 @@ def main(D):
 
             #Prediction on samples for the tests
             Y_hat_train_facto = M1.predict(X_train) # Optional, not really needed to test on training examples
-            #Y_hat_valid_facto = M1.predict(X_valid)
-            #Y_hat_test_facto = M1.predict(X_test)
+            Y_hat_valid_facto = M1.predict(X_valid)
+            Y_hat_test_facto = M1.predict(X_test)
             
             s = scoring_function(Y_train, Y_hat_train_facto)
             if (s > maxS) :
@@ -155,5 +154,5 @@ def main(D):
 
             
             # Print of the score for each set of parameters
-            #print("EPOCH = ",p,"ETA = ",e, 'Score (train set) =', scoring_function(Y_train, Y_hat_train_facto))
+            print("EPOCH = ",p,"ETA = ",e, 'Score (train set) =', scoring_function(Y_train, Y_hat_train_facto))
     return (maxS, maxE, maxEta)
